@@ -101,6 +101,10 @@ def index():
     return redirect("index.html")
 
 
+def custom_error_handler(e):
+    return "Erro interno!", 500
+
+
 def serve(df, open_browser, server_port=5000, server_logging=True, debug=False, server_host="127.0.0.1", ssl_context=None, csp=None):
     # TODO: We may add some auto port handling like this: https://stackoverflow.com/a/5089963/1804173
 
@@ -112,6 +116,7 @@ def serve(df, open_browser, server_port=5000, server_logging=True, debug=False, 
 
     if not server_logging:
         logging.getLogger("werkzeug").disabled = True
+	app.register_error_handler(Exception, custom_error_handler)
 
     if not server_logging and not open_browser:
         # https://stackoverflow.com/a/56856877/1804173
