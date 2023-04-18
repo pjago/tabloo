@@ -24,6 +24,9 @@ def add_header(response):
     response.cache_control.public = True
     response.cache_control.no_cache = True
     response.cache_control.no_store = True
+    csp = app.config.get('CSP', {})
+    if csp:
+	    response.headers['Content-Security-Policy'] = csp
     return response
 
 
@@ -98,10 +101,11 @@ def index():
     return redirect("index.html")
 
 
-def serve(df, open_browser, server_port=5000, server_logging=True, debug=False):
+def serve(df, open_browser, server_port=5000, server_logging=True, debug=False, server_host="127.0.0.1", ssl_context=None, csp=None):
     # TODO: We may add some auto port handling like this: https://stackoverflow.com/a/5089963/1804173
 
-    url = "http://127.0.0.1:{0}".format(server_port)
+    protocol = "http" if (ssl_context is None) else "https"
+    url = "{0}://{1}:{2}".format(protocol, server_host, server_port)
 
     global backend
     backend = Backend(df)
@@ -116,10 +120,18 @@ def serve(df, open_browser, server_port=5000, server_logging=True, debug=False):
     if open_browser:
         threading.Timer(0.25, lambda: webbrowser.open(url)).start()
 
-    app.run(
-        port=server_port,
-        debug=debug,
-        use_reloader=debug,
-        processes=1,
-        threaded=False,
-    )
+    options = {
+        'port': server_port,
+        'debug': debug,
+        'use_reloader': debug,
+        'processes': 1,
+        'threaded': False
+    }
+    
+    if csp:
+        app.config['CSP'] = csp
+    
+    if ssl_context:
+        options['ssl_context'] = ssl_context
+        
+    app.run(**options)
