@@ -12,6 +12,7 @@ def show(
     server_port: int = 5000,
     server_logging: bool = False,
     debug: bool = False,
+    **kwargs
 ):
     """
     Runs a Tabloo app on a given dataframe.
@@ -35,6 +36,7 @@ def show(
         server_port=server_port,
         server_logging=server_logging,
         debug=debug,
+        **kwargs
     )
 
 
