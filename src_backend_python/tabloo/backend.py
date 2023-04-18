@@ -118,6 +118,8 @@ class Backend(object):
             i = pagination_size * page
             j = pagination_size * (page + 1)
             df = df.iloc[i:j, :]
+        else:
+            raise NotImplementedError
 
         data = [
             {
